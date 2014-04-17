@@ -57,10 +57,13 @@ class Model(ObjectDict):
     _defaults_ = {}
 
     def __getattr__(self, name):
-        if name in self._defaults_:
+        if name not in self and name in self._defaults_:
             return self._defaults_[name]
         else:
             return super(Model, self).__getattr__(name)
+
+    def __repr__(self):
+        return '%s(%s)' % (self.__class__.__name__, super(Model, self).__repr__())
 
     @classmethod
     def by_id(cls, oid):
