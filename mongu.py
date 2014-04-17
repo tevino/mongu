@@ -14,7 +14,7 @@ def set_database(db_name):
 
 def get_connection():
     """Return a MongoClient instance associated to database
-     set by `set_database`."""
+     set by ``set_database``."""
     if not DB_NAME:
         raise Exception('Database must be set first!')
     return MongoClient()[DB_NAME]
@@ -62,8 +62,8 @@ class Model(ObjectDict):
 
     @classmethod
     def by_id(cls, oid):
-        """Find a model object by its `ObjectId`,
-         `oid` can be string or ObjectId"""
+        """Find a model object by its ``ObjectId``,
+         ``oid`` can be string or ObjectId"""
         if oid:
             return cls.from_dict(cls.collection.find_one(ObjectId(oid)))
 
@@ -81,18 +81,18 @@ class Model(ObjectDict):
 
     @classmethod
     def find(cls, *args, **kwargs):
-        """Same as `collection.find`, return model object instead of simple dict."""
+        """Same as ``collection.find``, return model object instead of simple dict."""
         return cls.from_cursor(cls.collection.find(*args, **kwargs))
 
     @classmethod
     def find_one(cls, *args, **kwargs):
-        """Same as `collection.find_one`, return model object instead of simple dict."""
+        """Same as ``collection.find_one``, return model object instead of simple dict."""
         return cls.from_dict(
             cls.collection.find_one(*args, **kwargs))
 
     @property
     def id(self):
-        """String representation of attribute `_id`."""
+        """String representation of attribute ``_id``."""
         if '_id' in self:
             return str(self._id)
 
@@ -131,7 +131,7 @@ def enable_counter(collection='counters', base=Model):
 
         @classmethod
         def change_by(cls, name, num):
-            """Change counter of `name` by `num`(can be negative)."""
+            """Change counter of ``name`` by ``num``(can be negative)."""
             counter = cls.collection.find_and_modify(
                 {'name': name},
                 {'$inc': {'seq': num}},
@@ -145,17 +145,17 @@ def enable_counter(collection='counters', base=Model):
 
         @classmethod
         def increase(cls, name):
-            """Increase counter of `name` by one."""
+            """Increase counter of ``name`` by one."""
             return cls.change_by(name, 1)
 
         @classmethod
         def decrease(cls, name):
-            """Decrease counter of `name` by one."""
+            """Decrease counter of ``name`` by one."""
             return cls.change_by(name, -1)
 
         @classmethod
         def count(cls, name):
-            """Return the count of `name`"""
+            """Return the count of ``name``"""
             counter = cls.collection.find_one({'name': name}) or {}
             return counter.get('seq', 0)
 
