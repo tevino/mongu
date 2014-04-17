@@ -20,7 +20,7 @@ def get_connection():
     return MongoClient()[DB_NAME]
 
 
-def RegisterModel(model_cls):
+def register_model(model_cls):
     """Decorator for registering model."""
     # set collection property
     model_cls.collection = getattr(get_connection(), model_cls._collection_)
@@ -51,6 +51,8 @@ class ObjectDict(dict):
 
 
 class Model(ObjectDict):
+    """Dict-like class with optional default key-values
+     that binds to a collection."""
     _collection_ = None
     _defaults_ = {}
 
@@ -122,42 +124,45 @@ class Model(ObjectDict):
         self.on_delete(self)
 
 
+class Counter(Model):
+    """Builtin counter model."""
+    _collection_ = None
+
+    @classmethod
+    def change_by(cls, name, num):
+        """Change counter of ``name`` by ``num``(can be negative)."""
+        counter = cls.collection.find_and_modify(
+            {'name': name},
+            {'$inc': {'seq': num}},
+            new=True,
+            upsert=True
+        )
+        seq = counter['seq']
+        if seq < 0:
+            raise Exception(u'seq of %s should not be %s' % (name, seq))
+        return seq
+
+    @classmethod
+    def increase(cls, name):
+        """Increase counter of ``name`` by one."""
+        return cls.change_by(name, 1)
+
+    @classmethod
+    def decrease(cls, name):
+        """Decrease counter of ``name`` by one."""
+        return cls.change_by(name, -1)
+
+    @classmethod
+    def count(cls, name):
+        """Return the count of ``name``"""
+        counter = cls.collection.find_one({'name': name}) or {}
+        return counter.get('seq', 0)
+
+
 def enable_counter(collection='counters', base=Model):
     """Register the builtin counter model and return it."""
-    @RegisterModel
-    class Counter(base):
-        """Builtin counter model."""
-        _collection_ = collection
-
-        @classmethod
-        def change_by(cls, name, num):
-            """Change counter of ``name`` by ``num``(can be negative)."""
-            counter = cls.collection.find_and_modify(
-                {'name': name},
-                {'$inc': {'seq': num}},
-                new=True,
-                upsert=True
-            )
-            seq = counter['seq']
-            if seq < 0:
-                raise Exception(u'seq of %s should not be %s' % (name, seq))
-            return seq
-
-        @classmethod
-        def increase(cls, name):
-            """Increase counter of ``name`` by one."""
-            return cls.change_by(name, 1)
-
-        @classmethod
-        def decrease(cls, name):
-            """Decrease counter of ``name`` by one."""
-            return cls.change_by(name, -1)
-
-        @classmethod
-        def count(cls, name):
-            """Return the count of ``name``"""
-            counter = cls.collection.find_one({'name': name}) or {}
-            return counter.get('seq', 0)
+    Counter._collection_ = collection
+    counter = register_model(Counter)
 
     logging.info('Counter enabled on collection: %s' % collection)
-    return Counter
+    return counter
