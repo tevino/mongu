@@ -22,7 +22,20 @@ Actually, if you have ever tried to write your own ODM, you may already implemen
 *Older(not ancient) version should work just fine, but 2.7 is tested.*
 
 # Documentation
-Read it here: http://mongu.readthedocs.org
+## A really quick example
+    set_database('test')  # always set database before anything else
+
+    @register_model
+    class User(Model):
+        _collection_ = 'users'                # collection name
+        _defaults_ = {'is_activated': False}  # default attribute
+
+    >> user = User(name='Mongu')
+    User({'name': 'Mongu', 'is_activated': False})
+    >> user.save()
+    User({'name': 'Mongu', 'is_activated': True, '_id': ObjectId('534f81bd7246ef6955d2388f')})
+
+For more detailed examples and API: http://mongu.readthedocs.org
 
 # License
 Code and documentation are available according to the MIT License.
