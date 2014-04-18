@@ -14,7 +14,7 @@ def set_database(db_name):
 
 def get_connection():
     """Return a MongoClient instance associated to database
-     set by ``set_database``."""
+    set by ``set_database``."""
     if not DB_NAME:
         raise Exception('Database must be set first!')
     return MongoClient()[DB_NAME]
@@ -39,7 +39,7 @@ def register_model(model_cls):
 
 class ObjectDict(dict):
     """Makes a dictionary behave like an object, with
-     attribute-style access."""
+    attribute-style access."""
     def __getattr__(self, name):
         try:
             return self[name]
@@ -52,7 +52,7 @@ class ObjectDict(dict):
 
 class Model(ObjectDict):
     """Dict-like class with optional default key-values
-     that binds to a collection."""
+    that binds to a collection."""
     _collection_ = None
     _defaults_ = {}
 
@@ -67,7 +67,7 @@ class Model(ObjectDict):
     @classmethod
     def by_id(cls, oid):
         """Find a model object by its ``ObjectId``,
-         ``oid`` can be string or ObjectId"""
+        ``oid`` can be string or ObjectId"""
         if oid:
             return cls.from_dict(cls.collection.find_one(ObjectId(oid)))
 
@@ -176,11 +176,19 @@ class Counter(Model):
 
 
 def enable_counter(collection='counters', base=Model):
-    """Register the builtin counter model and return it."""
+    """Register the builtin counter model, return the registered Counter class
+    and the corresponding ``CounterMixin`` class.
+
+    It automatically increases or decreases the counter of model class after model
+    creation(save without ``_id``) and deletion.
+
+    There is a classmethod ``count()`` added to the model class that returns the current
+    count of model collection."""
     Counter._collection_ = collection
     counter = register_model(Counter)
 
     class CounterMixin(object):
+        """Mixin class for model"""
         def on_save(self, old_dict):
             super(CounterMixin, self).on_save(old_dict)
             if not old_dict.get('_id'):
