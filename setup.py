@@ -12,6 +12,6 @@ setup(name='mongu',
       url='http://github.com/tevino/mongu',
       py_modules=['mongu'],
       scripts=['mongu.py'],
-      install_requires=['pymongo'],
+      install_requires=['pymongo>=2.7'],
       license=mongu.__license__,
       platforms='any')
