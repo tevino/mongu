@@ -22,7 +22,7 @@ Actually, if you have ever tried to write your own ODM, you may already implemen
 *Older(not ancient) version should work just fine, but 2.7 is tested.*
 
 # Documentation
-comming soon
+Read it here: http://mongu.readthedocs.org
 
 # License
 Code and documentation are available according to the MIT License.
