@@ -1,52 +1,45 @@
 # -*- coding: utf-8 -*-
-import unittest
-
-from mongu import set_database, register_model, Model
+from .base import TestCase
 
 
-class TestCase(unittest.TestCase):
-    def setUp(self):
-        set_database('test')
+class ModelTests(TestCase):
+    def test_defaults(self):
+        with self.new_user() as u:
+            assert not u.is_activated
 
-        @register_model
-        class User(Model):
-            _collection_ = 'users'
-            _defaults_ = {
-                'is_activated': False,
-            }
+    def test_method(self):
+        with self.new_user() as u:
+            u.activate()
+            assert u.is_activated
 
-            def activate(self):
-                self.is_activated = True
+    def test_save(self):
+        with self.new_user() as u:
+            assert '_id' not in u
+            u.save()
+            assert '_id' in u
 
-        self.User = User
+    def test_id(self):
+        with self.new_user(save=True) as u:
+            assert u.id == str(u._id)
 
-    def tearDown(self):
-        self.User.collection.drop()
+            u == self.User.by_id(u.id)
 
+    def test_reload(self):
+        with self.new_user(save=True) as u:
+            u.collection.find_and_modify(
+                {'username': u.username},
+                {'$set': {'is_activated': False}})
+            u.reload()
+            assert not u.is_activated
 
-class BasicTestCase(TestCase):
-    def test_basic(self):
-        user = self.User(username='Mongu')
-
-        assert not user.is_activated
-        user.activate()
-        assert user.is_activated
-
-        assert '_id' not in user
-        user.save()
-        assert '_id' in user
-        assert user.id == str(user._id)
-
-        user == self.User.by_id(user.id)
-
-        user.delete()
+    def test_delete(self):
+        with self.new_user(save=True) as u:
+            assert u.collection.find_one({'_id': u._id})
+            u.delete()
+            assert not u.collection.find_one({'_id': u._id})
 
     def test_creation(self):
         for name in ('Mongu', 'Rocks'):
             self.User(username=name).save()
 
         self.assertEqual(len(list(self.User.find({'username': 'Rocks'}))), 1)
-
-
-if __name__ == '__main__':
-    unittest.main()
