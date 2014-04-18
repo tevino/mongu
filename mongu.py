@@ -105,7 +105,7 @@ class Model(ObjectDict):
         if d:
             self.clear()
             self.update(self.from_dict(d))
-        elif '_id' in self:
+        elif self.id:
             new_dict = self.by_id(self._id)
             self.clear()
             self.update(new_dict)
@@ -134,7 +134,8 @@ class Model(ObjectDict):
 
     def delete(self):
         """Remove from database."""
-        self.collection.remove({'_id': self._id})
+        if self.id:
+            self.collection.remove({'_id': self._id})
         self.on_delete(self)
 
 
