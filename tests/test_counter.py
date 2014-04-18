@@ -18,8 +18,7 @@ class CounterTests(CounterTestCase):
 
     def test_increase(self):
         k = 'another'
-        self.Counter.increase(k)  # increase by 1
-        self.assertEqual(1, self.Counter.count(k))
+        self.assertEqual(1, self.Counter.increase(k))  # increase by 1
 
     def test_decrease(self):
         k = 'decrease'
@@ -29,9 +28,5 @@ class CounterTests(CounterTestCase):
 
     def test_change_by(self):
         k = 'more'
-        self.Counter.change_by(k, 3)   # increase by 3
-        self.assertEqual(3, self.Counter.count(k))
-
-        count = self.Counter.count(k)
-        self.Counter.change_by(k, -1)  # decrease by 1
-        self.assertEqual(count - 1, self.Counter.count(k))
+        self.assertEqual(3, self.Counter.change_by(k, 3))       # increase 0 by 3
+        self.assertEqual(3 - 1, self.Counter.change_by(k, -1))  # decrease 3 by 1
