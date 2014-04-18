@@ -3,27 +3,27 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Mongu! The missing snippet for pymongo!
+Introducing to Mongu
 ========================================
-**Mongu** is yet another Python Object-Document Mapper on top of ``PyMongo``.
+**Mongu** is yet another Python Object-Document Mapper on top of ``PyMongo``. It's lightweight, intuitive to use and easy to understand.
 
 - If you want **control**.
 - If you really care about **performance**.
-- If you have tried many **big and slow layers**.
+- If those **heavy and slow layers** have nothing or more than you need.
 
 Well, **Mongu** maybe the one for you.
+
+You are the only one who knows what you reall need.
+
+Therefor **Mongu** does nothing but a skeleton for you to fill.
+
+Actually, if you have ever tried to write your own ODM, you may already implemented parts of **Mongu** :D
 
 
 You don't need user-guides but examples to get started.
 ========================================================
 
-**Mongu** contains nothing but a skeleton for you to fill with things you need.
-
-You are the only one who knows what you reall need.
-
-We don't assume you are stupid.
-
-Here we go::
+We don't assume you are stupid, here we go::
 
     from mongu import set_database, register_model, Model
 
@@ -41,16 +41,18 @@ Here we go::
 
 **Basic manipulation**
 
-It's a dict::
+The model is a dict::
 
     >> user = User(username='Mongu')
-    >> print(user)
-    User({'username': 'Mongu'})
+    >> user
+    User({'username': 'Mongu', 'is_activated': False})
     >> 'username' in user
     True
-With customized methods::
+
+With your methods::
 
     >> user.activate()
+
 That work::
 
     >> user
@@ -73,7 +75,7 @@ You can find by ``str`` or ``ObjectId``, The following two lines get the same re
     User({u'username': u'Mongu', u'is_activated': True, u'_id': ObjectId('534f81bd7246ef6955d2388f')})
 
 
-**Query**
+**Query** (It's really just ``PyMongo``)
 
 Create some users::
 
@@ -116,7 +118,7 @@ Basic:
 -------
 
 .. automodule:: mongu
-   :members: set_database, enable_counter, register_model
+   :members: set_database, register_model, enable_counter
 
 
 Extra
@@ -126,7 +128,7 @@ Extra
    :members: get_connection, , ObjectDict
 
 
-Model:
+Base Model:
 --------------
 
 .. autoclass:: mongu.Model
