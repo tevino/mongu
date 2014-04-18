@@ -100,6 +100,18 @@ class Model(ObjectDict):
         if '_id' in self:
             return str(self._id)
 
+    def reload(self, d=None):
+        """Reload model from given dict or database."""
+        if d:
+            self.clear()
+            self.update(self.from_dict(d))
+        elif '_id' in self:
+            new_dict = self.by_id(self._id)
+            self.clear()
+            self.update(new_dict)
+        else:
+            raise Exception('Model must be saved first.')
+
     def on_save(self, saved_obj):
         """Hook after save."""
         pass
