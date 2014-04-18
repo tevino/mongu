@@ -112,7 +112,7 @@ class Model(ObjectDict):
         else:
             raise Exception('Model must be saved first.')
 
-    def on_save(self, saved_obj):
+    def on_save(self, old_dict):
         """Hook after save."""
         pass
 
@@ -123,9 +123,10 @@ class Model(ObjectDict):
             if k not in d:
                 v = v() if callable(v) else v
                 d[k] = v
+        old_dict = d.copy()
         _id = self.collection.save(d)
         self._id = _id
-        self.on_save(self)
+        self.on_save(old_dict)
         return self._id
 
     def on_delete(self, deleted_obj):
@@ -179,5 +180,19 @@ def enable_counter(collection='counters', base=Model):
     Counter._collection_ = collection
     counter = register_model(Counter)
 
+    class CounterMixin(object):
+        def on_save(self, old_dict):
+            super(CounterMixin, self).on_save(old_dict)
+            if not old_dict.get('_id'):
+                counter.increase(self._collection_)
+
+        def on_delete(self, *args, **kwargs):
+            super(CounterMixin, self).on_delete(*args, **kwargs)
+            counter.decrease(self._collection_)
+
+        @classmethod
+        def count(cls):
+            return counter.count(cls._collection_)
+
     logging.info('Counter enabled on collection: %s' % collection)
-    return counter
+    return counter, CounterMixin
