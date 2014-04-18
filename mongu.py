@@ -56,11 +56,10 @@ class Model(ObjectDict):
     _collection_ = None
     _defaults_ = {}
 
-    def __getattr__(self, name):
-        if name not in self and name in self._defaults_:
-            return self._defaults_[name]
-        else:
-            return super(Model, self).__getattr__(name)
+    def __init__(self, *args, **kwargs):
+        super(Model, self).__init__(*args, **kwargs)
+        for k, v in self._defaults_.iteritems():
+            self.setdefault(k, v)
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, super(Model, self).__repr__())
