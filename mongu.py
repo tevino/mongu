@@ -146,7 +146,7 @@ class Counter(Model):
 
     @classmethod
     def change_by(cls, name, num):
-        """Change counter of ``name`` by ``num``(can be negative)."""
+        """Change counter of ``name`` by ``num`` (can be negative)."""
         counter = cls.collection.find_and_modify(
             {'name': name},
             {'$inc': {'seq': num}},

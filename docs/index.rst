@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Introducing to Mongu
-========================================
+=====================
 **Mongu** is yet another Python Object-Document Mapper on top of ``PyMongo``. It's lightweight, intuitive to use and easy to understand.
 
 - If you want **control**.
@@ -20,14 +20,14 @@ Therefor **Mongu** does nothing but a skeleton for you to fill.
 Actually, if you have ever tried to write your own ODM, you may already implemented parts of **Mongu** :D
 
 
-You don't need user-guides but examples to get started.
+You don't need user-guides but examples to get started
 ========================================================
 
 We don't assume you are stupid, here we go::
 
     from mongu import set_database, register_model, Model
 
-    set_database('test') # set database before anything else
+    set_database('test') # always set database before anything else
 
 **Model definition**::
 
@@ -114,7 +114,7 @@ You konw Why::
 API References
 ===============
 
-Basic:
+Basic
 -------
 
 .. automodule:: mongu
@@ -128,16 +128,16 @@ Extra
    :members: get_connection, , ObjectDict
 
 
-Base Model:
---------------
+Base Model
+-----------
 
 .. autoclass:: mongu.Model
    :members:
    :member-order: bysource
 
 
-Builtin Counter:
-------------------------
+Builtin Counter
+-----------------
 
 For more information: `What and Why
 <http://docs.mongodb.org/manual/tutorial/create-an-auto-incrementing-field/#auto-increment-counters-collection>`_
@@ -145,6 +145,57 @@ For more information: `What and Why
 .. autoclass:: mongu.Counter
    :members:
    :member-order: bysource
+
+
+Example of using builtin ``Counter`` and ``CounterMixin``
+=========================================================
+
+We don't assume you are stupid::
+
+    >> from mongu import enable_counter
+
+    >> Counter, CounterMixin = enable_counter()
+
+**Define a Model with CounterMixin**::
+
+    >> @register_model
+    >> class User(CounterMixin, Model):          # order matters
+    >>     _collection_ = 'users'                # collection name
+
+
+**How to use builtin ``Counter`` and `CounterMixin`**::
+
+    >> for name in ('Builtin', 'Counter', 'Test'):
+    >>     User(username=name).save()  # counter increases after creation
+    >> User.count()                    # provided by ``CounterMixin``
+    3
+    >> User.find_one().delete()        # counter decreases adter deletion
+    >> User.count()
+    2
+
+**Use Counter independently**::
+
+    >> Counter.count('girlfriend')            # You born alone :|
+    0
+
+    >> Counter.increase('girlfriend')         # Before you find your first love :D
+    1
+    >> Counter.decrease('girlfriend')         # then you went through the very first break-up :(
+    0
+
+    >> Counter.change_by('girlfriend', 100)   # Oneday you had a crazy dream :P
+    100
+    >> Counter.change_by('girlfriend', -100)  # you woke up, everything turns to dust :(
+    0
+
+    >> Counter.count('girlfriend')            # Still dreaming? Check it again! 0_0
+    0
+
+So sad, right?
+
+Use **Mongu** to write your own story!
+
+
 
 
 .. toctree::
