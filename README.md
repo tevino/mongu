@@ -43,6 +43,6 @@ Code and documentation are available according to the MIT License.
 # Send feedback!
 If you thought **Mongu** is helpful, please [tell me](mailto:mail2tevin@gmail.com), a brif message like “This is what I always wanted” is enough, I would love to know!
 
-Of course by all means feel free to send pull requests or create issues in case you find something wrong.
+Of course by all means feel free to send pull requests or create issues, it's welcomed.
 
-Thanks.
+Thanks!
