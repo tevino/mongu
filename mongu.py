@@ -62,7 +62,8 @@ class Model(ObjectDict):
     def __init__(self, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
         for k, v in self._defaults_.iteritems():
-            self.setdefault(k, v)
+            value = v() if callable(v) else v
+            self.setdefault(k, value)
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, super(Model, self).__repr__())
@@ -122,10 +123,6 @@ class Model(ObjectDict):
     def save(self):
         """Save model object to database."""
         d = dict(self)
-        for k, v in self._defaults_.iteritems():
-            if k not in d:
-                v = v() if callable(v) else v
-                d[k] = v
         old_dict = d.copy()
         _id = self.collection.save(d)
         self._id = _id
