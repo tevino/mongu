@@ -29,18 +29,17 @@ Actually, if you have ever tried to write your own ODM, you may already implemen
 You don't need user-guides but examples to get started
 ========================================================
 
-We don't assume you are stupid, here we go::
-
-    from mongu import set_database, register_model, Model
-
-    set_database('test') # always set database before anything else
+We don't assume you are stupid, here we go
 
 **Model definition**::
 
+    from mongu import register_model, Model
+
     @register_model
     class User(Model):
+        _database_   = 'test'                 # database name
         _collection_ = 'users'                # collection name
-        _defaults_ = {'is_activated': False}  # default attribute
+        _defaults_ = {'is_activated': False}  # default attribute (callable value is supported)
 
         def activate(self):                   # a custom method
             self.is_activated = True
@@ -124,14 +123,14 @@ Basic
 -------
 
 .. automodule:: mongu
-   :members: set_database, register_model, enable_counter
+   :members: register_model, enable_counter
 
 
 Extra
 ------
 
 .. automodule:: mongu
-   :members: get_connection, , ObjectDict
+   :members: ObjectDict
 
 
 Base Model
@@ -165,8 +164,9 @@ We don't assume you are stupid::
 **Define a Model with CounterMixin**::
 
     >> @register_model
-    >> class User(CounterMixin, Model):          # order matters
-    >>     _collection_ = 'users'                # collection name
+    >> class User(CounterMixin, Model):  # order of base classes matters
+    >>     _database_   = 'test'
+    >>     _collection_ = 'users'
 
 
 **How to use builtin ``Counter`` and `CounterMixin`**::
