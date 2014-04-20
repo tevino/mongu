@@ -142,8 +142,6 @@ class Model(ObjectDict):
 
 class Counter(Model):
     """Builtin counter model."""
-    _collection_ = None
-
     @classmethod
     def change_by(cls, name, num):
         """Change counter of ``name`` by ``num`` (can be negative)."""
@@ -175,7 +173,7 @@ class Counter(Model):
         return counter.get('seq', 0)
 
 
-def enable_counter(collection='counters', base=Model):
+def enable_counter(base=None, collection='counters'):
     """Register the builtin counter model, return the registered Counter class
     and the corresponding ``CounterMixin`` class.
 
@@ -185,7 +183,8 @@ def enable_counter(collection='counters', base=Model):
     There is a classmethod ``count()`` added to the model class that returns the current
     count of model collection."""
     Counter._collection_ = collection
-    counter = register_model(Counter)
+    bases = (base, Counter) if base else (Counter,)
+    counter = register_model(type('Counter', bases, {}))
 
     class CounterMixin(object):
         """Mixin class for model"""
