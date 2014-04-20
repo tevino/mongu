@@ -6,6 +6,7 @@ class ModelTests(TestCase):
     def test_defaults(self):
         with self.new_user() as u:
             assert not u.is_activated
+            assert isinstance(u.created_at, float)
 
     def test_method(self):
         with self.new_user() as u:

@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+import time
 import unittest
 from mongu import set_database, register_model, Model, enable_counter
 
 
 class User(Model):
     _collection_ = 'users'
-    _defaults_ = {'is_activated': False}
+    _defaults_ = {
+        'is_activated': False,
+        'created_at': time.time
+    }
 
     def activate(self):
         self.is_activated = True
