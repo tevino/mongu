@@ -34,3 +34,7 @@ class CounterTests(CounterTestCase):
     def test_base(self):
         # `increase_by_6` is implemented in the base class
         self.assertEqual(self.Counter.increase_by_6('Final'), 6)
+
+    def test_exception(self):
+        # TODO: assert custom exception
+        self.assertRaises(Exception, self.Counter.change_by, 'exception', -100)
