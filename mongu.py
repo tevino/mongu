@@ -1,32 +1,18 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 import logging
 from bson import ObjectId
 from pymongo import MongoClient
 
-DB_NAME = None
-
-
-def set_database(db_name):
-    """Invoke this before any model registration."""
-    logging.info('Setting database to %s' % db_name)
-    globals()['DB_NAME'] = db_name
-
-
-def get_connection():
-    """Return a MongoClient instance associated to database
-    set by ``set_database``."""
-    if not DB_NAME:
-        raise Exception('Database must be set first!')
-    return MongoClient()[DB_NAME]
-
 
 def register_model(model_cls):
     """Decorator for registering model."""
-    # set collection property
-    model_cls.collection = getattr(get_connection(), model_cls._collection_)
+    if not getattr(model_cls, '_database_'):
+        raise Exception('Database not set on %s!' % model_cls.__name__)
+    if not getattr(model_cls, '_collection_'):
+        raise Exception('Collection not set on %s!' % model_cls.__name__)
 
     # merge _defaults_ from base classes
     defaults = {}
@@ -53,11 +39,25 @@ class ObjectDict(dict):
         self[name] = value
 
 
+class class_property(object):
+    """Calls the decorator method on class attribute access."""
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, instance, owner):
+        return self.getter(owner)
+
+
 class Model(ObjectDict):
     """Dict-like class with optional default key-values
     that binds to a collection."""
+    _database_ = None
     _collection_ = None
     _defaults_ = {}
+
+    @class_property
+    def collection(self):
+        return getattr(MongoClient()[self._database_], self._collection_)
 
     def __init__(self, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
@@ -173,7 +173,7 @@ class Counter(Model):
         return counter.get('seq', 0)
 
 
-def enable_counter(base=None, collection='counters'):
+def enable_counter(base=None, database='counter', collection='counters'):
     """Register the builtin counter model, return the registered Counter class
     and the corresponding ``CounterMixin`` class.
 
@@ -182,6 +182,7 @@ def enable_counter(base=None, collection='counters'):
 
     There is a classmethod ``count()`` added to the model class that returns the current
     count of model collection."""
+    Counter._database_ = database
     Counter._collection_ = collection
     bases = (base, Counter) if base else (Counter,)
     counter = register_model(type('Counter', bases, {}))

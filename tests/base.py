@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
-from mongu import set_database, register_model, Model, enable_counter
+from mongu import register_model, Model, enable_counter
 
 
 class User(Model):
+    _database_ = 'test'
     _collection_ = 'users'
     _defaults_ = {
         'is_activated': False,
@@ -37,7 +38,6 @@ def new_user(model):
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        set_database('test')
         self.User = register_model(User)
         self.new_user = new_user(User)
         self.new_admin = new_user(Admin)
@@ -54,7 +54,6 @@ class CounterBase(object):
 
 class CounterTestCase(unittest.TestCase):
     def setUp(self):
-        set_database('test')
         self.Counter, CounterMixin = enable_counter(base=CounterBase)
 
         class UserWithCounter(CounterMixin, User):
