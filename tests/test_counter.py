@@ -30,3 +30,7 @@ class CounterTests(CounterTestCase):
         k = 'more'
         self.assertEqual(3, self.Counter.change_by(k, 3))       # increase 0 by 3
         self.assertEqual(3 - 1, self.Counter.change_by(k, -1))  # decrease 3 by 1
+
+    def test_base(self):
+        # `increase_by_6` is implemented in the base class
+        self.assertEqual(self.Counter.increase_by_6('Final'), 6)

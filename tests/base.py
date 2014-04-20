@@ -46,10 +46,16 @@ class TestCase(unittest.TestCase):
         self.User.collection.drop()
 
 
+class CounterBase(object):
+    @classmethod
+    def increase_by_6(self, key):
+        return self.change_by(key, 6)
+
+
 class CounterTestCase(unittest.TestCase):
     def setUp(self):
         set_database('test')
-        self.Counter, CounterMixin = enable_counter()
+        self.Counter, CounterMixin = enable_counter(base=CounterBase)
 
         class UserWithCounter(CounterMixin, User):
             _collection_ = 'user_with_counter'
