@@ -145,16 +145,17 @@ class Counter(Model):
     @classmethod
     def change_by(cls, name, num):
         """Change counter of ``name`` by ``num`` (can be negative)."""
+        count = cls.count(name)
+        if count + num < 0:
+            raise Exception(u'Counter[%s] must be bigger than 0 after %+d.' % (name, num))
+
         counter = cls.collection.find_and_modify(
             {'name': name},
             {'$inc': {'seq': num}},
             new=True,
             upsert=True
         )
-        seq = counter['seq']
-        if seq < 0:
-            raise Exception(u'seq of %s should not be %s' % (name, seq))
-        return seq
+        return counter['seq']
 
     @classmethod
     def increase(cls, name):
