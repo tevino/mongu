@@ -15,25 +15,32 @@ class User(Model):
         self.is_activated = True
 
 
-class NewUser(object):
-    def __init__(self, save=False):
-        self.save = save
+class Admin(User):
+    _defaults_ = {'role': 'admin'}
 
-    def __enter__(self):
-        self.user = User(username='Mongu')
-        if self.save:
-            self.user.save()
-        return self.user
 
-    def __exit__(self, type, value, traceback):
-        self.user.delete()
+def new_user(model):
+    class NewUser(object):
+        def __init__(self, save=False):
+            self.save = save
+
+        def __enter__(self):
+            self.user = model(username='Mongu')
+            if self.save:
+                self.user.save()
+            return self.user
+
+        def __exit__(self, type, value, traceback):
+            self.user.delete()
+    return NewUser
 
 
 class TestCase(unittest.TestCase):
     def setUp(self):
         set_database('test')
         self.User = register_model(User)
-        self.new_user = NewUser
+        self.new_user = new_user(User)
+        self.new_admin = new_user(Admin)
 
     def tearDown(self):
         self.User.collection.drop()
@@ -48,7 +55,7 @@ class CounterTestCase(unittest.TestCase):
             _collection_ = 'user_with_counter'
 
         self.User = register_model(UserWithCounter)
-        self.new_user = NewUser
+        self.new_user = new_user(User)
 
     def tearDown(self):
         self.User.collection.drop()

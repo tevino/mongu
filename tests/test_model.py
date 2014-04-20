@@ -8,6 +8,12 @@ class ModelTests(TestCase):
             assert not u.is_activated
             assert isinstance(u.created_at, float)
 
+    def test_defaults_inheritance(self):
+        with self.new_admin() as a:
+            self.assertEqual(a.role, 'admin')
+            a.activate()
+            assert a.is_activated
+
     def test_method(self):
         with self.new_user() as u:
             u.activate()
