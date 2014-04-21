@@ -204,5 +204,5 @@ def enable_counter(base=None, database='counter', collection='counters'):
         def count(cls):
             return counter.count(cls._collection_)
 
-    logging.info('Counter enabled on collection: %s' % collection)
+    logging.info('Counter enabled on: %s' % counter.collection)
     return counter, CounterMixin
