@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from bson import ObjectId
 from .base import TestCase
 
 
@@ -46,7 +47,8 @@ class ModelTests(TestCase):
         with self.new_user(save=True) as u:
             assert u.id == str(u._id)
 
-            u == self.User.by_id(u.id)
+            assert u == self.User.by_id(u.id)
+        self.assertEqual(self.User.by_id(ObjectId()), None)
 
     def test_reload(self):
         with self.new_user(save=True) as u:
