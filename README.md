@@ -23,12 +23,12 @@ Actually, if you have ever tried to write your own ODM, you may already implemen
 
 # Documentation
 ## A really quick example
-    set_database('test')  # always set database before anything else
 
     @register_model
     class User(Model):
-        _collection_ = 'users'                # collection name
-        _defaults_ = {'is_activated': False}  # default attribute
+        _database_   = 'test'
+        _collection_ = 'users'
+        _defaults_   = {'is_activated': False}  # default attribute
 
     >> user = User(name='Mongu')
     User({'name': 'Mongu', 'is_activated': False})
