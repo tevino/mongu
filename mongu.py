@@ -72,8 +72,9 @@ class Model(ObjectDict):
     def by_id(cls, oid):
         """Find a model object by its ``ObjectId``,
         ``oid`` can be string or ObjectId"""
-        if oid:
-            return cls.from_dict(cls.collection.find_one(ObjectId(oid)))
+        d = cls.collection.find_one(ObjectId(oid))
+        if d:
+            return cls.from_dict(d)
 
     @classmethod
     def from_dict(cls, d):
