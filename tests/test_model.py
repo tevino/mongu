@@ -19,6 +19,23 @@ class ModelTests(TestCase):
             u.activate()
             assert u.is_activated
 
+    def test_find(self):
+        s = 'i need a lot of users!'
+        for name in s:
+            self.User(name=name).save()
+        self.assertEqual(len(list(self.User.find({'name': 'nobody'}))), 0)
+        count = 0
+        for user in self.User.find({'name': 'e'}):
+            assert isinstance(user, self.User)
+            count += 1
+        self.assertEqual(count, s.count('e'))
+
+        # test find_one
+        nobody = self.User.find_one({'name': 'nobody'})
+        self.assertEqual(nobody, None)
+        somebody = self.User.find_one({'name': '!'})
+        assert isinstance(somebody, self.User)
+
     def test_save(self):
         with self.new_user() as u:
             assert '_id' not in u
