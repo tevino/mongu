@@ -95,8 +95,9 @@ class Model(ObjectDict):
     @classmethod
     def find_one(cls, *args, **kwargs):
         """Same as ``collection.find_one``, return model object instead of simple dict."""
-        return cls.from_dict(
-            cls.collection.find_one(*args, **kwargs))
+        d = cls.collection.find_one(*args, **kwargs)
+        if d:
+            return cls(**d)
 
     @property
     def id(self):
