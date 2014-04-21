@@ -3,6 +3,7 @@
 __version__ = '0.2.2'
 
 import logging
+import warnings
 from bson import ObjectId
 from pymongo import MongoClient
 
@@ -74,11 +75,12 @@ class Model(ObjectDict):
         ``oid`` can be string or ObjectId"""
         d = cls.collection.find_one(ObjectId(oid))
         if d:
-            return cls.from_dict(d)
+            return cls(**d)
 
     @classmethod
     def from_dict(cls, d):
-        """Build model object from a dict."""
+        """Build model object from a dict. Will be removed in v1.0"""
+        warnings.warn('from_dict is deprecated and will be removed in v1.0!')
         d = d or {}
         return cls(**d)
 
@@ -86,7 +88,7 @@ class Model(ObjectDict):
     def from_cursor(cls, cursor):
         """Build model object from a pymongo cursor."""
         for d in cursor:
-            yield cls.from_dict(d)
+            yield cls(**d)
 
     @classmethod
     def find(cls, *args, **kwargs):
@@ -110,7 +112,7 @@ class Model(ObjectDict):
         """Reload model from given dict or database."""
         if d:
             self.clear()
-            self.update(self.from_dict(d))
+            self.update(d)
         elif self.id:
             new_dict = self.by_id(self._id)
             self.clear()
