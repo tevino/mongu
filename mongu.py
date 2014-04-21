@@ -4,6 +4,7 @@ __version__ = '0.2.3'
 
 import logging
 import warnings
+from collections import Callable
 from bson import ObjectId
 from pymongo import MongoClient
 
@@ -62,8 +63,8 @@ class Model(ObjectDict):
 
     def __init__(self, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
-        for k, v in self._defaults_.iteritems():
-            value = v() if callable(v) else v
+        for k, v in self._defaults_.items():
+            value = v() if isinstance(v, Callable) else v
             self.setdefault(k, value)
 
     def __repr__(self):
@@ -151,7 +152,7 @@ class Counter(Model):
         """Change counter of ``name`` by ``num`` (can be negative)."""
         count = cls.count(name)
         if count + num < 0:
-            raise Exception(u'Counter[%s] must be bigger than 0 after %+d.' % (name, num))
+            raise Exception('Counter[%s] must be bigger than 0 after %+d.' % (name, num))
 
         counter = cls.collection.find_and_modify(
             {'name': name},
