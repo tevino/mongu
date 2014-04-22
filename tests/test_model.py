@@ -57,6 +57,9 @@ class ModelTests(TestCase):
                 {'$set': {'is_activated': False}})
             u.reload()
             assert not u.is_activated
+            u.reload({'is_activated': True})
+            assert u.is_activated
+            assert 'username' not in u
 
     def test_delete(self):
         with self.new_user(save=True) as u:
