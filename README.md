@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tevino/mongu.svg?branch=master)](https://travis-ci.org/tevino/mongu)
+[![Build Status](https://travis-ci.org/tevino/mongu.svg?branch=master)](https://travis-ci.org/tevino/mongu) [![Coverage Status](https://coveralls.io/repos/tevino/mongu/badge.png?branch=master)](https://coveralls.io/r/tevino/mongu?branch=master)
 
 # Introducing to Mongu
 **Mongu** is yet another Python Object-Document Mapper on top of ``PyMongo``. It's lightweight, intuitive to use and easy to understand.
