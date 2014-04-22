@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from bson import ObjectId
+from bson.errors import InvalidId
 from .base import TestCase
 
 
@@ -48,6 +49,8 @@ class ModelTests(TestCase):
             assert u.id == str(u._id)
 
             assert u == self.User.by_id(u.id)
+        self.assertEqual(self.User.by_id(''), None)
+        self.assertRaises(InvalidId, self.User.by_id, 'blabla')
         self.assertEqual(self.User.by_id(ObjectId()), None)
 
     def test_reload(self):
