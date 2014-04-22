@@ -78,4 +78,5 @@ class ModelTests(TestCase):
 
     # Deprecated
     def test_from_dict(self):
-        self.assertEqual(self.User.from_dict(None).keys(), self.User().keys())
+        obj = self.assert_warn(UserWarning, self.User.from_dict, None)
+        self.assertEqual(obj.keys(), self.User().keys())
