@@ -5,9 +5,11 @@ We don't assume you are stupid, here we go
 
 **Model definition**::
 
-    from mongu import register_model, Model
+    from mongu import Client, Model
 
-    @register_model
+    c = Client()                              # connect to MongoDB
+
+    @c.register_model
     class User(Model):
         _database_   = 'test'                 # database name
         _collection_ = 'users'                # collection name

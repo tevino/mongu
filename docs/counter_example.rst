@@ -9,7 +9,7 @@ We don't assume you are stupid::
 
 **Define a Model with CounterMixin**::
 
-    >> @register_model
+    >> @c.register_model
     >> class User(CounterMixin, Model):  # order of base classes matters
     >>     _database_   = 'test'
     >>     _collection_ = 'users'

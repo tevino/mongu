@@ -5,14 +5,16 @@ Basic
 -------
 
 .. automodule:: mongu
-   :members: register_model, enable_counter
+   :members: enable_counter
 
+.. autoclass:: mongu.Client
+   :members:
 
 Extra
 ------
 
 .. autoclass:: mongu.ObjectDict
-   :members: 
+   :members:
 
 
 Base Model
