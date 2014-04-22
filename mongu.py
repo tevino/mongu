@@ -7,25 +7,48 @@ import warnings
 from collections import Callable
 from bson import ObjectId
 from pymongo import MongoClient
+from pymongo.errors import ConfigurationError
 
 
-def register_model(model_cls):
-    """Decorator for registering model."""
-    if not getattr(model_cls, '_database_'):
-        raise Exception('Database not set on %s!' % model_cls.__name__)
-    if not getattr(model_cls, '_collection_'):
-        raise Exception('Collection not set on %s!' % model_cls.__name__)
+class Client(object):
+    """For Connecting to MongoDB and registering model classes."""
+    def __init__(self, *args, **kwargs):
+        """Accept arguments same as ``MongoClient``.
 
-    # merge _defaults_ from base classes
-    defaults = {}
-    for b_cls in model_cls.__bases__:
-        defaults.update(getattr(b_cls, '_defaults_', {}))
+        example::
 
-    defaults.update(getattr(model_cls, '_defaults_', {}))
-    model_cls._defaults_ = defaults
+            >> Client('localhost', 27017)
+            >> Client('mongodb://localhost:27017')
+        """
+        self.client = MongoClient(*args, **kwargs)
+        try:
+            db = self.client.get_default_database()
+        except ConfigurationError:
+            pass
+        else:
+            warnings.warn(
+                'Database: %s in URI will not work' % db,
+                SyntaxWarning, stacklevel=2)
 
-    logging.info('Registering Model ' + model_cls.__name__)
-    return model_cls
+    def register_model(self, model_cls):
+        """Decorator for registering model."""
+        if not getattr(model_cls, '_database_'):
+            raise Exception('Database not set on %s!' % model_cls.__name__)
+        if not getattr(model_cls, '_collection_'):
+            raise Exception('Collection not set on %s!' % model_cls.__name__)
+
+        # merge _defaults_ from base classes
+        defaults = {}
+        for b_cls in model_cls.__bases__:
+            defaults.update(getattr(b_cls, '_defaults_', {}))
+
+        defaults.update(getattr(model_cls, '_defaults_', {}))
+        model_cls._defaults_ = defaults
+
+        model_cls._mongo_client_ = self.client
+
+        logging.info('Registering Model ' + model_cls.__name__)
+        return model_cls
 
 
 class ObjectDict(dict):
@@ -53,13 +76,16 @@ class class_property(object):
 class Model(ObjectDict):
     """Dict-like class with optional default key-values
     that binds to a collection."""
+    _mongo_client_ = None
     _database_ = None
     _collection_ = None
     _defaults_ = {}
 
     @class_property
     def collection(self):
-        return getattr(MongoClient()[self._database_], self._collection_)
+        if not self._mongo_client_:
+            self._mongo_client_ = MongoClient()
+        return getattr(self._mongo_client_[self._database_], self._collection_)
 
     def __init__(self, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
@@ -82,7 +108,9 @@ class Model(ObjectDict):
     @classmethod
     def from_dict(cls, d):
         """Build model object from a dict. Will be removed in v1.0"""
-        warnings.warn('from_dict is deprecated and will be removed in v1.0!')
+        warnings.warn(
+            'from_dict is deprecated and will be removed in v1.0!',
+            stacklevel=2)
         d = d or {}
         return cls(**d)
 
@@ -180,7 +208,7 @@ class Counter(Model):
         return counter.get('seq', 0)
 
 
-def enable_counter(base=None, database='counter', collection='counters'):
+def enable_counter(client=None, base=None, database='counter', collection='counters'):
     """Register the builtin counter model, return the registered Counter class
     and the corresponding ``CounterMixin`` class.
 
@@ -192,7 +220,8 @@ def enable_counter(base=None, database='counter', collection='counters'):
     Counter._database_ = database
     Counter._collection_ = collection
     bases = (base, Counter) if base else (Counter,)
-    counter = register_model(type('Counter', bases, {}))
+    client = client if client else Client()
+    counter = client.register_model(type('Counter', bases, {}))
 
     class CounterMixin(object):
         """Mixin class for model"""
