@@ -72,3 +72,7 @@ class ModelTests(TestCase):
             self.User(username=name).save()
 
         self.assertEqual(len(list(self.User.find({'username': 'Rocks'}))), 1)
+
+    # Deprecated
+    def test_from_dict(self):
+        self.assertEqual(self.User.from_dict(None).keys(), self.User().keys())
