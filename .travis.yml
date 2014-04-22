@@ -7,13 +7,15 @@ python:
   - "3.2"
   - "3.3"
 
-before_install:
-    pip install -r requirements.txt
-
 install:
+    - pip install -r requirements.txt
     - python setup.py install
 
-script: make test
+script:
+    coverage run --source=mongu setup.py test
+
+after_success:
+    coveralls
 
 services:
   - mongodb
