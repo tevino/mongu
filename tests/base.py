@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import time
+import warnings
 import unittest
-from mongu import register_model, Model, enable_counter
+from mongu import Client, Model, enable_counter
 
 
 class User(Model):
@@ -37,8 +38,17 @@ def new_user(model):
 
 
 class TestCase(unittest.TestCase):
+    def assert_warn(self, warn, func, *args, **kwargs):
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            # warnings.simplefilter("always")
+            res = func(*args, **kwargs)
+            assert issubclass(w[-1].category, warn)
+        return res
+
     def setUp(self):
-        self.User = register_model(User)
+        c = Client()
+        self.User = c.register_model(User)
         self.new_user = new_user(User)
         self.new_admin = new_user(Admin)
 
@@ -59,7 +69,8 @@ class CounterTestCase(unittest.TestCase):
         class UserWithCounter(CounterMixin, User):
             _collection_ = 'user_with_counter'
 
-        self.User = register_model(UserWithCounter)
+        c = Client()
+        self.User = c.register_model(UserWithCounter)
         self.new_user = new_user(User)
 
     def tearDown(self):
