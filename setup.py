@@ -35,4 +35,5 @@ setup(name='mongu',
       scripts=['mongu.py'],
       install_requires=['pymongo>=2.7'],
       license=__license__,
-      platforms='any')
+      platforms='any',
+      test_suite='tests.suite')
