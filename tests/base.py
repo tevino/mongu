@@ -2,7 +2,7 @@
 import time
 import warnings
 import unittest
-from mongu import Client, Model, enable_counter
+from mongu import Client, Model
 
 
 class User(Model):
@@ -64,12 +64,12 @@ class CounterBase(object):
 
 class CounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.Counter, CounterMixin = enable_counter(base=CounterBase)
+        c = Client()
+        self.Counter, CounterMixin = c.enable_counter(base=CounterBase)
 
         class UserWithCounter(CounterMixin, User):
             _collection_ = 'user_with_counter'
 
-        c = Client()
         self.User = c.register_model(UserWithCounter)
         self.new_user = new_user(User)
 

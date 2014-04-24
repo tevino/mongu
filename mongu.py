@@ -50,6 +50,38 @@ class Client(object):
         logging.info('Registering Model ' + model_cls.__name__)
         return model_cls
 
+    def enable_counter(self, base=None, database='counter', collection='counters'):
+        """Register the builtin counter model, return the registered Counter class
+        and the corresponding ``CounterMixin`` class.
+
+        The ``CounterMixin`` automatically increases and decreases the counter after model
+        creation(save without ``_id``) and deletion.
+
+        It contains a classmethod ``count()`` which returns the current count of
+        the model collection."""
+        Counter._database_ = database
+        Counter._collection_ = collection
+        bases = (base, Counter) if base else (Counter,)
+        counter = self.register_model(type('Counter', bases, {}))
+
+        class CounterMixin(object):
+            """Mixin class for model"""
+            def on_save(self, old_dict):
+                super(CounterMixin, self).on_save(old_dict)
+                if not old_dict.get('_id'):
+                    counter.increase(self._collection_)
+
+            def on_delete(self, *args, **kwargs):
+                super(CounterMixin, self).on_delete(*args, **kwargs)
+                counter.decrease(self._collection_)
+
+            @classmethod
+            def count(cls):
+                return counter.count(cls._collection_)
+
+        logging.info('Counter enabled on: %s' % counter.collection)
+        return counter, CounterMixin
+
 
 class ObjectDict(dict):
     """Makes a dictionary behave like an object, with
@@ -206,37 +238,3 @@ class Counter(Model):
         """Return the count of ``name``"""
         counter = cls.collection.find_one({'name': name}) or {}
         return counter.get('seq', 0)
-
-
-def enable_counter(client=None, base=None, database='counter', collection='counters'):
-    """Register the builtin counter model, return the registered Counter class
-    and the corresponding ``CounterMixin`` class.
-
-    It automatically increases or decreases the counter of model class after model
-    creation(save without ``_id``) and deletion.
-
-    There is a classmethod ``count()`` added to the model class that returns the current
-    count of model collection."""
-    Counter._database_ = database
-    Counter._collection_ = collection
-    bases = (base, Counter) if base else (Counter,)
-    client = client if client else Client()
-    counter = client.register_model(type('Counter', bases, {}))
-
-    class CounterMixin(object):
-        """Mixin class for model"""
-        def on_save(self, old_dict):
-            super(CounterMixin, self).on_save(old_dict)
-            if not old_dict.get('_id'):
-                counter.increase(self._collection_)
-
-        def on_delete(self, *args, **kwargs):
-            super(CounterMixin, self).on_delete(*args, **kwargs)
-            counter.decrease(self._collection_)
-
-        @classmethod
-        def count(cls):
-            return counter.count(cls._collection_)
-
-    logging.info('Counter enabled on: %s' % counter.collection)
-    return counter, CounterMixin
