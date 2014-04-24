@@ -138,6 +138,13 @@ class Model(ObjectDict):
                 return cls(**d)
 
     @classmethod
+    def delete_by_id(cls, oid):
+        """Delete a document from collection by its ``ObjectId``,
+        ``oid`` can be string or ObjectId"""
+        if oid:
+            cls.collection.remove(ObjectId(oid))
+
+    @classmethod
     def from_dict(cls, d):
         """Build model object from a dict. Will be removed in v1.0"""
         warnings.warn(

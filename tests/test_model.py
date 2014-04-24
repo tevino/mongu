@@ -70,6 +70,12 @@ class ModelTests(TestCase):
             u.delete()
             assert not u.collection.find_one({'_id': u._id})
 
+    def test_delete_by_id(self):
+        with self.new_user(save=True) as u:
+            assert u.collection.find_one({'_id': u._id})
+            self.User.delete_by_id(u.id)
+            assert not u.collection.find_one({'_id': u._id})
+
     def test_creation(self):
         for name in ('Mongu', 'Rocks'):
             self.User(username=name).save()
