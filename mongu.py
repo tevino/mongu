@@ -66,6 +66,21 @@ class Client(object):
 
         class CounterMixin(object):
             """Mixin class for model"""
+            @classmethod
+            def inc_counter(cls):
+                """Wrapper for ``Counter.increase()``."""
+                return counter.increase(cls._collection_)
+
+            @classmethod
+            def dec_counter(cls):
+                """Wrapper for ``Counter.decrease()``."""
+                return counter.decrease(cls._collection_)
+
+            @classmethod
+            def chg_counter(cls, *args, **kwargs):
+                """Wrapper for ``Counter.change_by()``."""
+                return counter.change_by(cls._collection_, *args, **kwargs)
+
             def on_save(self, old_dict):
                 super(CounterMixin, self).on_save(old_dict)
                 if not old_dict.get('_id'):
@@ -77,6 +92,7 @@ class Client(object):
 
             @classmethod
             def count(cls):
+                """Return the current count of this collection."""
                 return counter.count(cls._collection_)
 
         logging.info('Counter enabled on: %s' % counter.collection)

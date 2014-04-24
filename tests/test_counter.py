@@ -16,6 +16,22 @@ class CounterTests(CounterTestCase):
     def test_initial(self):
         self.assertEqual(0, self.Counter.count('something-new'))
 
+    def test_inc_counter(self):
+        c = self.User.count()
+        self.User.inc_counter()
+        self.assertEqual(self.User.count(), c + 1)
+
+    def test_dec_counter(self):
+        self.User.inc_counter()
+        c = self.User.count()
+        self.User.dec_counter()
+        self.assertEqual(self.User.count(), c - 1)
+
+    def test_chg_counter(self):
+        c = self.User.count()
+        self.User.chg_counter(100)
+        self.assertEqual(self.User.count(), c + 100)
+
     def test_increase(self):
         k = 'another'
         self.assertEqual(1, self.Counter.increase(k))  # increase by 1
