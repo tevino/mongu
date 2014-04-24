@@ -232,6 +232,20 @@ class Model(ObjectDict):
 class Counter(Model):
     """Builtin counter model."""
     @classmethod
+    def set_to(cls, name, num):
+        """Set counter of ``name`` to ``num``."""
+        if num < 0:
+            raise Exception('Counter[%s] can not be set to %s' % (name, num))
+        else:
+            counter = cls.collection.find_and_modify(
+                {'name': name},
+                {'$set': {'seq': num}},
+                new=True,
+                upsert=True
+            )
+            return counter['seq']
+
+    @classmethod
     def change_by(cls, name, num):
         """Change counter of ``name`` by ``num`` (can be negative)."""
         count = cls.count(name)
