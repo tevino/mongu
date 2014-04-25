@@ -81,6 +81,11 @@ class Client(object):
                 """Wrapper for ``Counter.change_by()``."""
                 return counter.change_by(cls._collection_, *args, **kwargs)
 
+            @classmethod
+            def set_counter(cls, *args, **kwargs):
+                """Wrapper for ``Counter.set_to()``."""
+                return counter.set_to(cls._collection_, *args, **kwargs)
+
             def on_save(self, old_dict):
                 super(CounterMixin, self).on_save(old_dict)
                 if not old_dict.get('_id'):

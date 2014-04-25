@@ -32,6 +32,10 @@ class CounterTests(CounterTestCase):
         self.User.chg_counter(100)
         self.assertEqual(self.User.count(), c + 100)
 
+    def test_set_counter(self):
+        self.User.set_counter(77)
+        self.assertEqual(self.User.count(), 77)
+
     def test_increase(self):
         k = 'another'
         self.assertEqual(1, self.Counter.increase(k))  # increase by 1
