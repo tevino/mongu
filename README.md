@@ -29,7 +29,8 @@ Actually, if you have ever tried to write your own ODM, you may already implemen
 # Documentation
 ## A really quick example
 
-    @register_model
+    c = Client()
+    @c.register_model
     class User(Model):
         _database_   = 'test'
         _collection_ = 'users'
