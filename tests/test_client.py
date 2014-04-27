@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .base import TestCase
-from mongu import Client
+from mongu import Client, Model
 from pymongo import MongoClient
 
 
@@ -15,3 +15,13 @@ class ClientTests(TestCase):
 
     def test_warning(self):
         self.assert_warn(SyntaxWarning, Client, 'mongodb://localhost:27017/database')
+
+    def test_no_database(self):
+        class BrokenModel(Model):
+            _collection_ = 'test'
+        self.assertRaises(Exception, self.client.register_model, BrokenModel)
+
+    def test_no_collection(self):
+        class BrokenModel(Model):
+            _database_ = 'test'
+        self.assertRaises(Exception, self.client.register_model, BrokenModel)
