@@ -10,6 +10,10 @@ class ModelTests(TestCase):
             assert not u.is_activated
             assert isinstance(u.created_at, float)
 
+    def test_attributes(self):
+        with self.new_user() as u:
+            self.assertRaises(AttributeError, u.__getattr__, 'wrong_attr')
+
     def test_defaults_inheritance(self):
         with self.new_admin() as a:
             self.assertEqual(a.role, 'admin')
