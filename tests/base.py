@@ -33,7 +33,10 @@ def new_user(model):
             return self.user
 
         def __exit__(self, type, value, traceback):
-            self.user.delete()
+            try:
+                self.user.delete()
+            except:
+                pass
     return NewUser
 
 
@@ -51,6 +54,7 @@ class TestCase(unittest.TestCase):
         self.User = c.register_model(User)
         self.new_user = new_user(User)
         self.new_admin = new_user(Admin)
+        self.client = c
 
     def tearDown(self):
         self.User.collection.drop()
@@ -72,6 +76,7 @@ class CounterTestCase(unittest.TestCase):
 
         self.User = c.register_model(UserWithCounter)
         self.new_user = new_user(User)
+        self.client = c
 
     def tearDown(self):
         self.User.collection.drop()
