@@ -69,3 +69,10 @@ class CounterTests(CounterTestCase):
     def test_delete_exception(self):
         user = self.User(username='xx')
         self.assertRaises(Exception, user.delete)
+
+    def test_on_delete(self):
+        user = self.User(username='xx')
+        user.save()
+        before = self.User.count()
+        user.delete()
+        self.assertEqual(before - 1, self.User.count())
