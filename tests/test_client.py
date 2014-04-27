@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .base import TestCase
-from mongu import Client, Model
+from mongu import Client, Model, ModelAttributeError
 from pymongo import MongoClient
 
 
@@ -19,15 +19,15 @@ class ClientTests(TestCase):
     def test_no_database(self):
         class BrokenModel(Model):
             _collection_ = 'test'
-        self.assertRaises(Exception, self.client.register_model, BrokenModel)
+        self.assertRaises(ModelAttributeError, self.client.register_model, BrokenModel)
 
     def test_no_collection(self):
         class BrokenModel(Model):
             _database_ = 'test'
-        self.assertRaises(Exception, self.client.register_model, BrokenModel)
+        self.assertRaises(ModelAttributeError, self.client.register_model, BrokenModel)
 
     def test_no_registration(self):
         class MyModel(Model):
             _database_ = 'test'
             _collection_ = 'test'
-        self.assertRaises(Exception, getattr, MyModel, 'collection')
+        self.assertRaises(ModelAttributeError, getattr, MyModel, 'collection')

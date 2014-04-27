@@ -33,9 +33,9 @@ class Client(object):
     def register_model(self, model_cls):
         """Decorator for registering model."""
         if not getattr(model_cls, '_database_'):
-            raise Exception('Database not set on %s!' % model_cls.__name__)
+            raise ModelAttributeError('_database_ missing on %s!' % model_cls.__name__)
         if not getattr(model_cls, '_collection_'):
-            raise Exception('Collection not set on %s!' % model_cls.__name__)
+            raise ModelAttributeError('_collection_ missing on %s!' % model_cls.__name__)
 
         # merge _defaults_ from base classes
         defaults = {}
@@ -51,14 +51,14 @@ class Client(object):
         return model_cls
 
     def enable_counter(self, base=None, database='counter', collection='counters'):
-        """Register the builtin counter model, return the registered Counter class
-        and the corresponding ``CounterMixin`` class.
+        """Register the builtin counter model, return the registered Counter
+        class and the corresponding ``CounterMixin`` class.
 
-        The ``CounterMixin`` automatically increases and decreases the counter after model
-        creation(save without ``_id``) and deletion.
+        The ``CounterMixin`` automatically increases and decreases the counter
+        after model creation(save without ``_id``) and deletion.
 
-        It contains a classmethod ``count()`` which returns the current count of
-        the model collection."""
+        It contains a classmethod ``count()`` which returns the current count
+        of the model collection."""
         Counter._database_ = database
         Counter._collection_ = collection
         bases = (base, Counter) if base else (Counter,)
@@ -137,7 +137,7 @@ class Model(ObjectDict):
     @class_property
     def collection(self):
         if not self._mongo_client_:
-            raise Exception('Collection is available after registration!')
+            raise ModelAttributeError('collection is available after registration!')
         return getattr(self._mongo_client_[self._database_], self._collection_)
 
     def __init__(self, *args, **kwargs):
@@ -208,7 +208,9 @@ class Model(ObjectDict):
             self.clear()
             self.update(new_dict)
         else:
-            raise Exception('Model must be saved first.')
+            # should I raise an exception here?
+            # Like "Model must be saved first."
+            pass
 
     def on_save(self, old_dict):
         """Hook after save."""
@@ -224,13 +226,13 @@ class Model(ObjectDict):
         return self._id
 
     def on_delete(self, deleted_obj):
-        """Hook after delete."""
+        """Hook after delete successful."""
         pass
 
     def delete(self):
         """Remove from database."""
         if not self.id:
-            raise Exception('Model must be saved before deletion!')
+            return
         self.collection.remove({'_id': self._id})
         self.on_delete(self)
 
@@ -241,7 +243,7 @@ class Counter(Model):
     def set_to(cls, name, num):
         """Set counter of ``name`` to ``num``."""
         if num < 0:
-            raise Exception('Counter[%s] can not be set to %s' % (name, num))
+            raise CounterValueError('Counter[%s] can not be set to %s' % (name, num))
         else:
             counter = cls.collection.find_and_modify(
                 {'name': name},
@@ -256,7 +258,7 @@ class Counter(Model):
         """Change counter of ``name`` by ``num`` (can be negative)."""
         count = cls.count(name)
         if count + num < 0:
-            raise Exception('Counter[%s] must be bigger than 0 after %+d.' % (name, num))
+            raise CounterValueError('Counter[%s] will be negative after %+d.' % (name, num))
 
         counter = cls.collection.find_and_modify(
             {'name': name},
@@ -281,3 +283,16 @@ class Counter(Model):
         """Return the count of ``name``"""
         counter = cls.collection.find_one({'name': name}) or {}
         return counter.get('seq', 0)
+
+
+class MonguException(Exception):
+    """Base class for exceptions from mongu."""
+    pass
+
+
+class ModelAttributeError(MonguException):
+    pass
+
+
+class CounterValueError(MonguException):
+    pass

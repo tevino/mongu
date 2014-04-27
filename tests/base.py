@@ -33,10 +33,7 @@ def new_user(model):
             return self.user
 
         def __exit__(self, type, value, traceback):
-            try:
-                self.user.delete()
-            except:
-                pass
+            self.user.delete()
     return NewUser
 
 
@@ -60,16 +57,10 @@ class TestCase(unittest.TestCase):
         self.User.collection.drop()
 
 
-class CounterBase(object):
-    @classmethod
-    def increase_by_6(self, key):
-        return self.change_by(key, 6)
-
-
 class CounterTestCase(unittest.TestCase):
     def setUp(self):
         c = Client()
-        self.Counter, CounterMixin = c.enable_counter(base=CounterBase)
+        self.Counter, CounterMixin = c.enable_counter()
 
         class UserWithCounter(CounterMixin, User):
             _collection_ = 'user_with_counter'

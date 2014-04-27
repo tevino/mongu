@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from .base import CounterTestCase
 from random import randint
+from mongu import CounterValueError
+from .base import CounterTestCase
 
 
 class CounterTests(CounterTestCase):
@@ -56,19 +57,19 @@ class CounterTests(CounterTestCase):
         r = randint(0, 100)
         self.Counter.set_to(k, r)
         self.assertEqual(self.Counter.count(k), r)
-        self.assertRaises(Exception, self.Counter.set_to, k, -r)
+        self.assertRaises(CounterValueError, self.Counter.set_to, k, -r)
 
     def test_base(self):
-        # `increase_by_6` is implemented in the base class
-        self.assertEqual(self.Counter.increase_by_6('Final'), 6)
+        class CounterBase(object):
+            @classmethod
+            def increase_by_6(self, key):
+                return self.change_by(key, 6)
+
+        Counter, _ = self.client.enable_counter(base=CounterBase)
+        self.assertEqual(Counter.increase_by_6('Final'), 6)
 
     def test_change_by_exception(self):
-        # TODO: assert custom exception
-        self.assertRaises(Exception, self.Counter.change_by, 'exception', -100)
-
-    def test_delete_exception(self):
-        user = self.User(username='xx')
-        self.assertRaises(Exception, user.delete)
+        self.assertRaises(CounterValueError, self.Counter.change_by, 'exception', -9999)
 
     def test_on_delete(self):
         user = self.User(username='xx')
