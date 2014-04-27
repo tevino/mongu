@@ -25,3 +25,9 @@ class ClientTests(TestCase):
         class BrokenModel(Model):
             _database_ = 'test'
         self.assertRaises(Exception, self.client.register_model, BrokenModel)
+
+    def test_no_registration(self):
+        class MyModel(Model):
+            _database_ = 'test'
+            _collection_ = 'test'
+        self.assertRaises(Exception, getattr, MyModel, 'collection')

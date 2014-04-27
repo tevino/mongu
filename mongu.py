@@ -137,7 +137,7 @@ class Model(ObjectDict):
     @class_property
     def collection(self):
         if not self._mongo_client_:
-            self._mongo_client_ = MongoClient()
+            raise Exception('Collection is available after registration!')
         return getattr(self._mongo_client_[self._database_], self._collection_)
 
     def __init__(self, *args, **kwargs):
