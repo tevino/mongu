@@ -229,8 +229,9 @@ class Model(ObjectDict):
 
     def delete(self):
         """Remove from database."""
-        if self.id:
-            self.collection.remove({'_id': self._id})
+        if not self.id:
+            raise Exception('Model must be saved before deletion!')
+        self.collection.remove({'_id': self._id})
         self.on_delete(self)
 
 
