@@ -68,6 +68,10 @@ class ModelTests(TestCase):
             assert u.is_activated
             assert 'username' not in u
 
+    def test_reload_exception(self):
+        with self.new_user() as u:
+            self.assertRaises(Exception, u.reload)
+
     def test_delete(self):
         with self.new_user(save=True) as u:
             assert u.collection.find_one({'_id': u._id})
