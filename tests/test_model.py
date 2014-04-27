@@ -86,6 +86,14 @@ class ModelTests(TestCase):
 
         self.assertEqual(len(list(self.User.find({'username': 'Rocks'}))), 1)
 
+    def test_repr(self):
+        with self.new_user() as u:
+            model_repr = repr(u)
+            dict_repr = repr(dict(u))
+            self.assertEqual(
+                model_repr.replace(dict_repr, ''),
+                u.__class__.__name__ + '()')
+
     # Deprecated
     def test_from_dict(self):
         obj = self.assert_warn(UserWarning, self.User.from_dict, None)
