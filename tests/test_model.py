@@ -90,9 +90,8 @@ class ModelTests(TestCase):
         with self.new_user() as u:
             model_repr = repr(u)
             dict_repr = repr(dict(u))
-            self.assertEqual(
-                model_repr.replace(dict_repr, ''),
-                u.__class__.__name__ + '()')
+            assert len(model_repr) > len(dict_repr)
+            assert dict_repr in model_repr
 
     # Deprecated
     def test_from_dict(self):
