@@ -6,17 +6,13 @@
 # Introducing to Mongu
 **Mongu** is yet another Python Object-Document Mapper on top of ``PyMongo``. It's lightweight, intuitive to use and easy to understand.
 
-- If you want **control**.
-- If you really care about **performance**.
-- If those **heavy and slow layers** have nothing or more than you need.
-
-Well, **Mongu** maybe the one for you.
+If those **heavy and slow layers** have nothing or more than you need, Mongu maybe the one for you.
 
 You are the only one who knows what you reall need.
 
-Therefor **Mongu** does nothing but a skeleton for you to fill.
+Therefor **Mongu does nothing but a skeleton for you to fill**.
 
-Actually, if you have ever tried to write your own ODM, you may already implemented parts of **Mongu** :D
+Actually, if you have ever tried to write your own ODM, you may already implemented parts of Mongu :D
 
 # Installation
 	pip install mongu
@@ -47,7 +43,7 @@ For more detailed examples and API: http://mongu.readthedocs.org
 Code and documentation are available according to the MIT License.
 
 # Send feedback!
-If you thought **Mongu** is helpful, please [tell me](mailto:mail2tevin@gmail.com), a brif message like “This is what I always wanted” is enough, I would love to know!
+If you thought Mongu is helpful, please [tell me](mailto:mail2tevin@gmail.com), a brif message like “This is what I always wanted” is enough, I would love to know!
 
 Of course by all means feel free to send pull requests or create issues, it's always welcome and appreciated.
 
