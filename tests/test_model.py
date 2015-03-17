@@ -91,7 +91,8 @@ class ModelTests(TestCase):
             model_repr = repr(u)
             dict_repr = repr(dict(u))
             assert len(model_repr) > len(dict_repr)
-            assert dict_repr in model_repr
+            model_dict_repr = model_repr[model_repr.find('(') + 1: -1]
+            self.assertEqual(eval(model_dict_repr), eval(dict_repr))
 
     # Deprecated
     def test_from_dict(self):
