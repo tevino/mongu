@@ -37,14 +37,6 @@ class Client(object):
         if not getattr(model_cls, '_collection_'):
             raise ModelAttributeError('_collection_ missing on %s!' % model_cls.__name__)
 
-        # merge _defaults_ from base classes
-        defaults = {}
-        for b_cls in model_cls.__bases__:
-            defaults.update(getattr(b_cls, '_defaults_', {}))
-
-        defaults.update(getattr(model_cls, '_defaults_', {}))
-        model_cls._defaults_ = defaults
-
         model_cls._mongo_client_ = self.client
 
         logging.info('Registering Model ' + model_cls.__name__)
@@ -140,11 +132,24 @@ class Model(ObjectDict):
             raise ModelAttributeError('collection is available after registration!')
         return getattr(self._mongo_client_[self._database_], self._collection_)
 
-    def __init__(self, *args, **kwargs):
-        super(Model, self).__init__(*args, **kwargs)
-        for k, v in self._defaults_.items():
+    def __new__(cls, *args, **kwargs):
+        """set defaults for instance of model"""
+        # merge _defaults_ from base classes
+        defaults = {}
+        for b_cls in cls.__bases__:
+            defaults.update(getattr(b_cls, '_defaults_', {}))
+
+        # override with subclass's _defaults_
+        defaults.update(getattr(cls, '_defaults_', {}))
+        cls._defaults_ = defaults
+
+        # set default to instance
+        instance = super(Model, cls).__new__(cls, *args, **kwargs)
+        for k, v in cls._defaults_.items():
             value = v() if isinstance(v, Callable) else v
-            self.setdefault(k, value)
+            instance.setdefault(k, value)
+
+        return instance
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, super(Model, self).__repr__())
