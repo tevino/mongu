@@ -24,6 +24,7 @@ class Client(object):
         try:
             db = self.client.get_default_database()
         except ConfigurationError:
+            # make sure database is not provided in URI
             pass
         else:
             warnings.warn(
@@ -33,16 +34,19 @@ class Client(object):
     def register_model(self, model_cls):
         """Decorator for registering model."""
         if not getattr(model_cls, '_database_'):
-            raise ModelAttributeError('_database_ missing on %s!' % model_cls.__name__)
+            raise ModelAttributeError('_database_ missing '
+                                      'on %s!' % model_cls.__name__)
         if not getattr(model_cls, '_collection_'):
-            raise ModelAttributeError('_collection_ missing on %s!' % model_cls.__name__)
+            raise ModelAttributeError('_collection_ missing '
+                                      'on %s!' % model_cls.__name__)
 
         model_cls._mongo_client_ = self.client
 
         logging.info('Registering Model ' + model_cls.__name__)
         return model_cls
 
-    def enable_counter(self, base=None, database='counter', collection='counters'):
+    def enable_counter(self, base=None, database='counter',
+                       collection='counters'):
         """Register the builtin counter model, return the registered Counter
         class and the corresponding ``CounterMixin`` class.
 
@@ -129,7 +133,8 @@ class Model(ObjectDict):
     @class_property
     def collection(self):
         if not self._mongo_client_:
-            raise ModelAttributeError('collection is available after registration!')
+            raise ModelAttributeError('collection is not available before '
+                                      'registration!')
         return getattr(self._mongo_client_[self._database_], self._collection_)
 
     def __new__(cls, *args, **kwargs):
@@ -152,7 +157,8 @@ class Model(ObjectDict):
         return instance
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, super(Model, self).__repr__())
+        return '%s(%s)' % (self.__class__.__name__,
+                           super(Model, self).__repr__())
 
     @classmethod
     def by_id(cls, oid):
@@ -187,12 +193,13 @@ class Model(ObjectDict):
 
     @classmethod
     def find(cls, *args, **kwargs):
-        """Same as ``collection.find``, return model object instead of simple dict."""
+        """Same as ``collection.find``, returns model object instead of dict."""
         return cls.from_cursor(cls.collection.find(*args, **kwargs))
 
     @classmethod
     def find_one(cls, *args, **kwargs):
-        """Same as ``collection.find_one``, return model object instead of simple dict."""
+        """Same as ``collection.find_one``, returns model object instead of
+        dict."""
         d = cls.collection.find_one(*args, **kwargs)
         if d:
             return cls(**d)
@@ -248,7 +255,8 @@ class Counter(Model):
     def set_to(cls, name, num):
         """Set counter of ``name`` to ``num``."""
         if num < 0:
-            raise CounterValueError('Counter[%s] can not be set to %s' % (name, num))
+            raise CounterValueError('Counter[%s] can not be set to %s' % (
+                                    name, num))
         else:
             counter = cls.collection.find_and_modify(
                 {'name': name},
@@ -263,7 +271,8 @@ class Counter(Model):
         """Change counter of ``name`` by ``num`` (can be negative)."""
         count = cls.count(name)
         if count + num < 0:
-            raise CounterValueError('Counter[%s] will be negative after %+d.' % (name, num))
+            raise CounterValueError('Counter[%s] will be negative '
+                                    'after %+d.' % (name, num))
 
         counter = cls.collection.find_and_modify(
             {'name': name},
